@@ -67,22 +67,20 @@ local keys = {
       end),
    },
    { key = 'c',          mods = 'CTRL|SHIFT',  action = act.CopyTo('Clipboard') },
+   { key = 'v',          mods = 'CTRL',        action = act.PasteFrom('Clipboard') },
    { key = 'v',          mods = 'CTRL|SHIFT',  action = act.PasteFrom('Clipboard') },
-
-   { key = 'n',          mods = 'CTRL|SHIFT',  action = act.SendString('\u{2660}') },
-   { key = 's',          mods = 'CTRL|SHIFT',  action = act.SendString('\u{203D}') },
 
    -- tabs --
    -- tabs: spawn+close
    { key = 't',          mods = mod.SUPER,     action = act.SpawnTab('DefaultDomain') },
-   { key = 't',          mods = mod.SUPER_REV, action = act.SpawnTab({ DomainName = 'wsl:ubuntu' }) },
-   { key = 'w',          mods = mod.SUPER_REV, action = act.CloseCurrentTab({ confirm = false }) },
+   { key = 'u',          mods = mod.SUPER,     action = act.SpawnTab({ DomainName = 'wsl:ubuntu' }) },
+   { key = 'w',          mods = mod.SUPER,     action = act.CloseCurrentTab({ confirm = true }) },
 
    -- tabs: navigation
    { key = '[',          mods = mod.SUPER,     action = act.ActivateTabRelative(-1) },
    { key = ']',          mods = mod.SUPER,     action = act.ActivateTabRelative(1) },
-   { key = '[',          mods = mod.SUPER_REV, action = act.MoveTabRelative(-1) },
-   { key = ']',          mods = mod.SUPER_REV, action = act.MoveTabRelative(1) },
+   { key = ';',          mods = mod.SUPER,     action = act.MoveTabRelative(-1) },
+   { key = "'",          mods = mod.SUPER,     action = act.MoveTabRelative(1) },
 
    -- tab: title
    { key = '0',          mods = mod.SUPER,     action = act.EmitEvent('tabs.manual-update-tab-title') },
@@ -138,7 +136,7 @@ local keys = {
 
    -- background controls --
    {
-      key = [[/]],
+      key = 'm',
       mods = mod.SUPER,
       action = wezterm.action_callback(function(window, _pane)
          backdrops:random(window)
@@ -160,7 +158,7 @@ local keys = {
    },
    {
       key = [[/]],
-      mods = mod.SUPER_REV,
+      mods = mod.SUPER,
       action = act.InputSelector({
          title = 'InputSelector: Select Background',
          choices = backdrops:choices(),
@@ -186,8 +184,8 @@ local keys = {
    -- panes --
    -- panes: split panes
    {
-      key = [[\]],
-      mods = mod.SUPER,
+      key = '-',
+      mods = mod.SUPER_REV,
       action = act.SplitVertical({ domain = 'CurrentPaneDomain' }),
    },
    {
@@ -196,9 +194,8 @@ local keys = {
       action = act.SplitHorizontal({ domain = 'CurrentPaneDomain' }),
    },
 
-   -- panes: zoom+close pane
-   { key = 'Enter', mods = mod.SUPER,     action = act.TogglePaneZoomState },
-   { key = 'w',     mods = mod.SUPER,     action = act.CloseCurrentPane({ confirm = false }) },
+   -- panes: close pane
+   { key = 'w', mods = mod.SUPER_REV, action = act.CloseCurrentPane({ confirm = true }) },
 
    -- panes: navigation
    { key = 'i',     mods = mod.SUPER_REV, action = act.ActivatePaneDirection('Up') },
@@ -212,10 +209,11 @@ local keys = {
    },
 
    -- panes: scroll pane
-   { key = 'u',        mods = mod.SUPER, action = act.ScrollByLine(-5) },
-   { key = 'd',        mods = mod.SUPER, action = act.ScrollByLine(5) },
-   { key = 'PageUp',   mods = 'NONE',    action = act.ScrollByPage(-0.75) },
-   { key = 'PageDown', mods = 'NONE',    action = act.ScrollByPage(0.75) },
+   { key = 'd',         mods = mod.SUPER,     action = act.ScrollByLine(5) },
+   { key = 'UpArrow',   mods = mod.SUPER_REV, action = act.ScrollToTop },
+   { key = 'DownArrow', mods = mod.SUPER_REV, action = act.ScrollToBottom },
+   { key = 'PageUp',    mods = 'NONE',        action = act.ScrollByPage(-0.75) },
+   { key = 'PageDown',  mods = 'NONE',        action = act.ScrollByPage(0.75) },
 
    -- key-tables --
    -- resizes fonts
@@ -262,6 +260,16 @@ local key_tables = {
 
 ---@type MouseBinding[]
 local mouse_bindings = {
+   {
+      event = { Down = { streak = 1, button = { WheelUp = 1 } } },
+      mods = 'CTRL',
+      action = act.IncreaseFontSize,
+   },
+   {
+      event = { Down = { streak = 1, button = { WheelDown = 1 } } },
+      mods = 'CTRL',
+      action = act.DecreaseFontSize,
+   },
    -- Ctrl-click will open the link under the mouse cursor
    {
       event = { Up = { streak = 1, button = 'Left' } },
