@@ -4,8 +4,8 @@ local colors = require('colors.custom')
 ---@type Config
 return {
    max_fps = 60,
-   -- The 2024 WebGPU/D3D12 build hangs on this machine's graphics stack.
-   front_end = 'OpenGL', ---@type 'WebGpu' | 'OpenGL' | 'Software'
+   front_end = 'WebGpu', ---@type 'WebGpu' | 'OpenGL' | 'Software'
+   webgpu_power_preference = 'HighPerformance',
    underline_thickness = '1.5pt',
 
    -- cursor
