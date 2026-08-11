@@ -19,7 +19,7 @@ if platform.is_win then
          distribution = 'Ubuntu',
          username = 'wxh',
          default_cwd = '/home/wxh',
-         default_prog = { 'bash', '-l' },
+         default_prog = { 'zsh', '-l' },
       },
    }
 end
