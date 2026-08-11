@@ -8,9 +8,22 @@ local mod = {}
 if platform.is_mac then
    mod.SUPER = 'SUPER'
    mod.SUPER_REV = 'SUPER|CTRL'
+   mod.CLIPBOARD = 'SUPER'
 elseif platform.is_win or platform.is_linux then
    mod.SUPER = 'ALT' -- to not conflict with Windows key shortcuts
    mod.SUPER_REV = 'ALT|CTRL'
+   mod.CLIPBOARD = 'CTRL'
+end
+
+local copy_action = act.CopyTo('Clipboard')
+if not platform.is_mac then
+   copy_action = wezterm.action_callback(function(window, pane)
+      if window:get_selection_text_for_pane(pane) ~= '' then
+         window:perform_action(act.CopyTo('Clipboard'), pane)
+      else
+         window:perform_action(act.SendKey({ key = 'c', mods = 'CTRL' }), pane)
+      end
+   end)
 end
 
 -- stylua: ignore
@@ -55,19 +68,9 @@ local keys = {
    { key = 'Backspace',  mods = mod.SUPER,     action = act.SendString('\u{15}') },
 
    -- copy/paste --
-   {
-      key = 'c',
-      mods = 'CTRL',
-      action = wezterm.action_callback(function(window, pane)
-         if window:get_selection_text_for_pane(pane) ~= '' then
-            window:perform_action(act.CopyTo('Clipboard'), pane)
-         else
-            window:perform_action(act.SendKey({ key = 'c', mods = 'CTRL' }), pane)
-         end
-      end),
-   },
+   { key = 'c',          mods = mod.CLIPBOARD, action = copy_action },
    { key = 'c',          mods = 'CTRL|SHIFT',  action = act.CopyTo('Clipboard') },
-   { key = 'v',          mods = 'CTRL',        action = act.PasteFrom('Clipboard') },
+   { key = 'v',          mods = mod.CLIPBOARD, action = act.PasteFrom('Clipboard') },
    { key = 'v',          mods = 'CTRL|SHIFT',  action = act.PasteFrom('Clipboard') },
 
    -- tabs --
