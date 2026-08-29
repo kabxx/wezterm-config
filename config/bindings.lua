@@ -237,6 +237,19 @@ local keys = {
    },
 }
 
+if platform.is_mac then
+   table.insert(keys, {
+      key = 'Enter',
+      mods = 'SHIFT',
+      action = act.SendKey({ key = 'Enter', mods = 'ALT' }),
+   })
+   table.insert(keys, {
+      key = 'Enter',
+      mods = 'ALT',
+      action = act.Nop,
+   })
+end
+
 -- stylua: ignore
 ---@type table<string, Key[]>
 local key_tables = {
