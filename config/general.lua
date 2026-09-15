@@ -7,7 +7,7 @@ return {
    status_update_interval = 1000,
    audible_bell = 'Disabled',
 
-   scrollback_lines = 20000,
+   scrollback_lines = 5000,
 
    hyperlink_rules = {
       -- Matches: a URL in parens: (URL)

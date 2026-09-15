@@ -30,6 +30,7 @@ end
 ---@type Key[]
 local keys = {
    -- misc/useful --
+
    { key = 'F1', mods = 'NONE', action = act.ActivateCopyMode },
    { key = 'F2', mods = 'NONE', action = act.ActivateCommandPalette },
    { key = 'F3', mods = 'NONE', action = act.ShowLauncher },
@@ -235,20 +236,32 @@ local keys = {
          timeout_milliseconds = 1000,
       }),
    },
-}
 
-if platform.is_mac then
-   table.insert(keys, {
+   {
       key = 'Enter',
       mods = 'SHIFT',
-      action = act.SendKey({ key = 'Enter', mods = 'ALT' }),
-   })
-   table.insert(keys, {
-      key = 'Enter',
-      mods = 'ALT',
-      action = act.Nop,
-   })
-end
+      action = wezterm.action_callback(function(window, pane)
+         local domain = pane:get_domain_name()
+      
+         if platform.is_mac then
+            window:perform_action(
+               act.SendKey({ key = 'Enter', mods = 'ALT' }),
+               pane
+            )
+         elseif platform.is_linux or domain:match('^wsl') then
+            window:perform_action(
+               act.SendString('\x0a'),
+               pane
+            )
+         else
+            window:perform_action(
+               act.SendKey({ key = 'Enter', mods = 'SHIFT' }),
+               pane
+            )
+         end
+      end),
+   },
+}
 
 -- stylua: ignore
 ---@type table<string, Key[]>
