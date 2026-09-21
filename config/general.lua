@@ -1,6 +1,9 @@
 ---@type Config
 return {
    -- behaviours
+   -- Kitty protocol + Windows IME: single latin keys become CSI-u and
+   -- vanish in WSL/herdr; IME-committed strings still arrive as text.
+   enable_kitty_keyboard = false,
    automatically_reload_config = true,
    exit_behavior = 'CloseOnCleanExit', -- if the shell program exited with a successful status
    exit_behavior_messaging = 'Verbose',

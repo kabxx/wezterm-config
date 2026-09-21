@@ -26,6 +26,8 @@ if not platform.is_mac then
    end)
 end
 
+
+
 -- stylua: ignore
 ---@type Key[]
 local keys = {
@@ -237,29 +239,21 @@ local keys = {
       }),
    },
 
+   -- Kitty CSI-u newline. Survives SSH/PTY.
    {
       key = 'Enter',
       mods = 'SHIFT',
-      action = wezterm.action_callback(function(window, pane)
-         local domain = pane:get_domain_name()
-      
-         if platform.is_mac then
-            window:perform_action(
-               act.SendKey({ key = 'Enter', mods = 'ALT' }),
-               pane
-            )
-         elseif platform.is_linux or domain:match('^wsl') then
-            window:perform_action(
-               act.SendString('\x0a'),
-               pane
-            )
-         else
-            window:perform_action(
-               act.SendKey({ key = 'Enter', mods = 'SHIFT' }),
-               pane
-            )
-         end
-      end),
+      action = act.SendString('\x1b[13;2u'),
+   },
+   {
+      key = 'Enter',
+      mods = 'ALT',
+      action = act.SendString('\x1b[13;2u'),
+   },
+   {
+      key = 'Enter',
+      mods = 'CTRL',
+      action = act.SendString('\x1b[13;2u'),
    },
 }
 
