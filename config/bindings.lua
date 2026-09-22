@@ -26,7 +26,43 @@ if not platform.is_mac then
    end)
 end
 
+-- Shift+Enter: send what the *current* env understands.
+-- Never CSI-u (ESC[13;2u) — shells that don't speak Kitty print a leftover "u".
+local function send_shift_enter(window, pane)
+   local domain = pane:get_domain_name() or ''
+   local info = pane.get_foreground_process_info and pane:get_foreground_process_info()
+   local proc = ((info and info.executable) or pane:get_foreground_process_name() or ''):lower()
+   local parts = { domain:lower(), proc, (pane:get_title() or ''):lower() }
+   if info and info.argv then
+      for _, arg in ipairs(info.argv) do
+         parts[#parts + 1] = tostring(arg):lower()
+      end
+   end
+   local blob = table.concat(parts, ' ')
 
+   local is_wsl = domain:match('^wsl') or blob:find('wsl', 1, true)
+   local is_ssh = domain:lower():find('ssh', 1, true) or proc:find('ssh', 1, true)
+
+   if blob:find('macbook', 1, true)
+      or blob:find('100.88.54.65', 1, true)
+      or blob:find('%f[%w]mac%f[%W]')
+   then
+      window:perform_action(act.SendKey({ key = 'Enter', mods = 'ALT' }), pane)
+      return
+   end
+
+   if (platform.is_win and not is_ssh and not is_wsl)
+      or blob:find('wintx', 1, true)
+      or blob:find('100.104.64.48', 1, true)
+      or blob:find('laptop%-', 1, true)
+      or blob:find('desktop%-', 1, true)
+   then
+      window:perform_action(act.SendKey({ key = 'Enter', mods = 'SHIFT' }), pane)
+      return
+   end
+
+   window:perform_action(act.SendString('\x0a'), pane)
+end
 
 -- stylua: ignore
 ---@type Key[]
@@ -239,21 +275,12 @@ local keys = {
       }),
    },
 
-   -- Kitty CSI-u newline. Survives SSH/PTY.
    {
       key = 'Enter',
       mods = 'SHIFT',
-      action = act.SendString('\x1b[13;2u'),
-   },
-   {
-      key = 'Enter',
-      mods = 'ALT',
-      action = act.SendString('\x1b[13;2u'),
-   },
-   {
-      key = 'Enter',
-      mods = 'CTRL',
-      action = act.SendString('\x1b[13;2u'),
+      action = wezterm.action_callback(function(window, pane)
+         send_shift_enter(window, pane)
+      end),
    },
 }
 
